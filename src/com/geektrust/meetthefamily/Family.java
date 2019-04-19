@@ -1,66 +1,27 @@
 package com.geektrust.meetthefamily;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 public class Family {
 
-	private Member queen;
-
-	/**
-	 * Initialize the given family tree
-	 * 
-	 * @param args
-	 * @throws FileNotFoundException
-	 */
-	public void initTree(String path) throws FileNotFoundException {
-		queen = new Member("Queen Anga", Gender.Female, null, null);
-		try {
-			File file = new File(path);
-			processInitFile(file);
-		} catch (NullPointerException npe) {
-			System.out.println("Please provide correct file path!");
-			throw npe;
-		}
-
-	}
-
-	private void processInitFile(File file) throws FileNotFoundException {
-		try (Scanner sc = new Scanner(file)) {
-			while (sc.hasNextLine()) {
-				String command = sc.nextLine();
-				processInitCommand(command);
-			}
-		} catch (FileNotFoundException e) {
-			System.out.println("INITIALIZATION ERROR!");
-			System.out.println("Please check initialise file.");
-			throw e;
-		}
+	private static final String FEMALE = "Female";
+	
+	private Member familyHead;
+	
+	private void setFamilyHead(Member familyHead) {
+		this.familyHead = familyHead;
 	}
 
 	/**
-	 * Process command to initialize family tree.
+	 * Add head of the family.
 	 * 
-	 * @param command
+	 * @param name - name of the member
+	 * @param gender - gender
 	 */
-	private void processInitCommand(String command) {
-		String[] commandParams = command.split(";");
-		switch (commandParams[0]) {
-		case "ADD_CHILD":
-			addchild(commandParams[1], commandParams[2], commandParams[3]);
-			break;
-
-		case "ADD_SPOUSE":
-			addSpouse(commandParams[1], commandParams[2], commandParams[3]);
-			break;
-
-		default:
-			System.out.println("INVALID COMMAND!");
-			break;
-		}
+	public void addFamilyHead(String name, String gender) {
+		Gender g = (FEMALE.equals(gender)) ? Gender.Female : Gender.Male;
+		setFamilyHead(new Member(name, g, null, null));
 	}
 
 	/**
@@ -71,10 +32,10 @@ public class Family {
 	 * @param spouseName
 	 * @param gender
 	 */
-	private void addSpouse(String memberName, String spouseName, String gender) {
-		Member member = searchMember(queen, memberName);
+	public void addSpouse(String memberName, String spouseName, String gender) {
+		Member member = searchMember(familyHead, memberName);
 		if (member != null && member.spouse == null) {
-			Gender g = ("Female".equals(gender)) ? Gender.Female : Gender.Male;
+			Gender g = (FEMALE.equals(gender)) ? Gender.Female : Gender.Male;
 			Member sp = new Member(spouseName, g, null, null);
 			sp.addSpouse(member);
 			member.addSpouse(sp);
@@ -84,20 +45,20 @@ public class Family {
 	/**
 	 * Add child to a member iff {@link Member} is not null and member is female.
 	 * 
-	 * @param motherName
+	 * @param motherName - member whose child to be added
 	 * @param childName
 	 * @param gender
 	 * @return
 	 */
 	public String addchild(String motherName, String childName, String gender) {
 		String result;
-		Member member = searchMember(queen, motherName);
+		Member member = searchMember(familyHead, motherName);
 		if (member == null) {
 			result = "PERSON_NOT_FOUND";
 		} else if (childName == null || gender == null) {
 			result = "CHILD_ADDITION_FAILED";
 		} else if (member.gender == Gender.Female) {
-			Gender g = ("Female".equals(gender)) ? Gender.Female : Gender.Male;
+			Gender g = (FEMALE.equals(gender)) ? Gender.Female : Gender.Male;
 			Member child = new Member(childName, g, member.spouse, member);
 			member.addChild(child);
 			result = "CHILD_ADDITION_SUCCEEDED";
@@ -118,7 +79,7 @@ public class Family {
 	public String getRelationship(String person, String relationship) {
 
 		String relations;
-		Member member = searchMember(queen, person);
+		Member member = searchMember(familyHead, person);
 		if (member == null) {
 			relations = "PERSON_NOT_FOUND";
 		} else if (relationship == null) {
@@ -220,13 +181,13 @@ public class Family {
 		if (member.spouse != null) {
 			String spouse = member.spouse.name;
 			Member temp = member.spouse.mother;
-			if(temp != null) {
+			if (temp != null) {
 				for (Member m : temp.children) {
 					if (!spouse.equals(m.name) && m.gender == gender) {
 						sb.append(m.name).append(" ");
 					}
 				}
-			}			
+			}
 		}
 
 		searchInMotherChildren(member, gender, personName, sb);
@@ -298,7 +259,7 @@ public class Family {
 	 * @return {@link Member} object
 	 */
 	private Member searchMember(Member head, String memberName) {
-		if (memberName == null) {
+		if (memberName == null || head == null) {
 			return null;
 		}
 

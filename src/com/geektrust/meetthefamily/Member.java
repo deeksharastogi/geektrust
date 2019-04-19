@@ -54,4 +54,5 @@ public class Member {
 	public void addSpouse(Member spouse) {
 		this.spouse = spouse;
 	}
+	
 }

@@ -4,6 +4,7 @@ import java.nio.file.Paths;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+
 import com.geektrust.meetthefamily.Solution;
 
 class TestSolution {
@@ -40,8 +41,6 @@ class TestSolution {
 	@Test
 	public void mainWithInvalidInputFile() {
 		Solution.main(pathInitFile, "input/input1test.txt");
-	}
-	
-	
+	}	
 
 }

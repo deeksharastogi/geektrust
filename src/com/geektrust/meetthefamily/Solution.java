@@ -6,33 +6,52 @@ import java.util.Scanner;
 
 public class Solution {
 
-	public static void main(String ...args) {
+	public static void main(String... args) {
 
 		Family family = new Family();
+		Solution sol = new Solution();
+
 		try {
-			family.initTree(args[0]);
-			File file = new File(args[1]);
-			processInputFile(family, file);
+			sol.initFileToProcess(family, args[0], false);
+			sol.initFileToProcess(family, args[1], true);
 		} catch (ArrayIndexOutOfBoundsException e) {
-			System.out.println("Please enter file location!");
-		} catch (FileNotFoundException e1) {
-			System.out.println("File Not Found!! Please check the file and the location provided!");
+			System.out.println("Please enter file location(s)!");
 		}
 
 	}
 
 	/**
-	 * Process input file.
+	 * Read file to process.
 	 * 
-	 * @param family - object on which the command to be processed
-	 * @param file   - input file
+	 * @param family
+	 * @param filePath
+	 * @param isInputFile
+	 * @throws FileNotFoundException
 	 */
-	private static void processInputFile(Family family, File file) {
+	public void initFileToProcess(Family family, String filePath, boolean isInputFile) {
+		File file = new File(filePath);
+		processInputFile(family, file, isInputFile);
+	}
+
+	/**
+	 * Process file.
+	 * 
+	 * @param family      - object on which the command to be processed
+	 * @param file        - file to be processed
+	 * @param isInputFile - flag to check if file being processed is input or init
+	 *                    file.
+	 * 
+	 */
+	private void processInputFile(Family family, File file, boolean isInputFile) {
 		try (Scanner sc = new Scanner(file)) {
 			while (sc.hasNextLine()) {
 				String command = sc.nextLine();
-				String commandResult = processCommand(family, command);
-				System.out.println(commandResult);
+
+				if (isInputFile) {
+					processInputCommand(family, command);
+				} else {
+					processInitCommand(family, command);
+				}
 			}
 		} catch (FileNotFoundException e) {
 			System.out.println("File Not Found!! Please check the file and the location provided!");
@@ -46,7 +65,7 @@ public class Solution {
 	 * @param command - input command string to be processed
 	 * @return
 	 */
-	private static String processCommand(Family family, String command) {
+	private void processInputCommand(Family family, String command) {
 		String[] commandParams = command.split(" ");
 		String commandResult;
 		switch (commandParams[0]) {
@@ -62,6 +81,36 @@ public class Solution {
 			commandResult = "INVALID COMMAND!";
 			break;
 		}
-		return commandResult;
+
+		System.out.println(commandResult);
+	}
+
+	/**
+	 * Process command to initialize family tree.
+	 * 
+	 * @param family
+	 * 
+	 * @param command
+	 */
+	private void processInitCommand(Family family, String command) {
+		String[] commandParams = command.split(";");
+		switch (commandParams[0]) {
+
+		case "ADD_FAMILY_HEAD":
+			family.addFamilyHead(commandParams[1], commandParams[2]);
+			break;
+
+		case "ADD_CHILD":
+			family.addchild(commandParams[1], commandParams[2], commandParams[3]);
+			break;
+
+		case "ADD_SPOUSE":
+			family.addSpouse(commandParams[1], commandParams[2], commandParams[3]);
+			break;
+
+		default:
+			System.out.println("INVALID INIT COMMAND!");
+			break;
+		}
 	}
 }

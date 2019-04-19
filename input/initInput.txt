@@ -1,3 +1,4 @@
+ADD_FAMILY_HEAD;Queen Anga;Female
 ADD_SPOUSE;Queen Anga;King Shan;Male
 ADD_CHILD;Queen Anga;Chit;Male
 ADD_SPOUSE;Chit;Amba;Female

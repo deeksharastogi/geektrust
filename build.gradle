@@ -8,11 +8,13 @@ sourceSets {
    }
    
    test {
-   		java {
-         srcDir 'src/test'
-      }    
-      
-   }
+		java {
+			srcDir 'src/test'
+		}    
+		resources {
+		    srcDir 'src/test/java'
+		} 
+	}
 }
 
 sourceCompatibility = 1.8
@@ -30,7 +32,7 @@ jar {
 }
 
 test {
-	//useJUnitPlatform()
+	useJUnitPlatform()
 	testLogging {
         events "passed", "skipped", "failed"
     }

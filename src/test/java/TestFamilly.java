@@ -1,17 +1,16 @@
 package test.java;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.io.FileNotFoundException;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvFileSource;
+import org.junit.jupiter.params.provider.CsvSource;
+
 import com.geektrust.meetthefamily.Family;
+import com.geektrust.meetthefamily.Solution;
 
 class TestFamilly {
 
@@ -22,33 +21,12 @@ class TestFamilly {
 	private static Family family;
 
 	@BeforeAll
-	static void setUpBeforeClass() throws FileNotFoundException {
-		Path path = Paths.get("input/initInput.txt");
+	static void setUpBeforeClass()  {
 		family = new Family();
-		family.initTree(path.toAbsolutePath().toString());
-	}
-
-	@Test
-	public void initTreeWithNoInputFile() {
-		Family familyObject = new Family();
-		assertThrows(NullPointerException.class, () -> {
-			familyObject.initTree(null);
-		});
-	}
-
-	@Test
-	public void initTreeWithInvalidCommandFile() throws FileNotFoundException {
-		Path path = Paths.get("input/initInputtest.txt");
-		Family familyObject = new Family();
-		familyObject.initTree(path.toAbsolutePath().toString());
-	}
-
-	@Test
-	public void initTreeWithAbsentCommandFile() {
-		Family familyObject = new Family();
-		assertThrows(FileNotFoundException.class, () -> {
-			familyObject.initTree("input/inittest.txt");
-		});
+		Solution sol = new Solution();
+		
+		String pathInitFile = Paths.get("input/initInput.txt").toAbsolutePath().toString();
+		sol.initFileToProcess(family, pathInitFile, false);
 	}
 
 	@Test
@@ -92,7 +70,19 @@ class TestFamilly {
 	}
 
 	@ParameterizedTest
-	@CsvFileSource(resources = "data.csv", numLinesToSkip = 1)
+	@CsvSource({
+		"Satya,WIFE,NOT YET IMPLEMENTED",
+		"Satya,Paternal-Uncle,NONE",
+		"Kriya,Paternal-Uncle,Asva",
+		"Asva,Maternal-Uncle,Chit Ish Vich Aras",
+		"Tritha,Paternal-Aunt,Satya",
+		"Yodhan,Maternal-Aunt,Tritha",
+		"Satvy,Sister-In-Law,Atya",
+		"Vyas,Brother-In-Law,Asva",
+		"Queen Anga,Son,Chit Ish Vich Aras",
+		"Queen Anga,Daughter,Satya",
+		"Chit,Siblings,Ish Vich Aras Satya"
+	})
 	public void getRelationshipValuesFromCsvFile(String memberName, String relation, String expected) {
 		String actual = family.getRelationship(memberName, relation);
 		assertEquals(expected, actual);

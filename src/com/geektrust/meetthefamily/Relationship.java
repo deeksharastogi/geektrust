@@ -1,6 +1,8 @@
 package com.geektrust.meetthefamily;
 
 public class Relationship {
+	
+	private Relationship() {}
 
 	public static final String PATERNAL_UNCLE = "Paternal-Uncle";
 
