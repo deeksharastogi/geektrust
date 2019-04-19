@@ -1,0 +1,3 @@
+ADD_SPOUSE;Queen Anga;King Shan;Male
+ADD_CHILD;Queen Anga;Chit;Male
+ADD_INVALID;Satya;Atya;Female

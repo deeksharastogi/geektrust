@@ -1,0 +1,46 @@
+apply plugin: 'java'
+
+sourceSets {
+   main {
+      java {
+         srcDir 'src/com'
+      }
+   }
+   
+   test {
+   		java {
+         srcDir 'src/test'
+      }    
+      
+   }
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'com.geektrust.meetthefamily.Solution'
+    }   
+     
+    // To create a single jar with all dependencies.
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+	}
+}
+
+test {
+	//useJUnitPlatform()
+	testLogging {
+        events "passed", "skipped", "failed"
+    }
+}
+
+repositories {
+     mavenCentral()
+}
+dependencies {
+	testCompile("org.junit.jupiter:junit-jupiter-api:5.4.2")
+    testCompile("org.junit.jupiter:junit-jupiter-params:5.4.2")
+    testRuntime("org.junit.jupiter:junit-jupiter-engine:5.4.2")
+}

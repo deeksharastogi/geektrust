@@ -1,0 +1,24 @@
+plugins {
+    id 'java'
+}
+
+sourceSets {
+   main {
+      java {
+         srcDir 'src/com'
+      }
+   }
+   
+   test {
+   	java {
+         srcDir 'src/test/geektrust/meetthefamily'
+      }      
+   }
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+test {
+    useJUnitPlatform()
+}

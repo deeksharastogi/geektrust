@@ -1,0 +1,12 @@
+memberName,relationship,expected result
+Satya,WIFE,NOT YET IMPLEMENTED
+Satya,Paternal-Uncle,NONE
+Kriya,Paternal-Uncle,Asva
+Asva,Maternal-Uncle,Chit Ish Vich Aras
+Tritha,Paternal-Aunt,Satya
+Yodhan,Maternal-Aunt,Tritha
+Satvy,Sister-In-Law,Atya
+Vyas,Brother-In-Law,Asva
+Queen Anga,Son,Chit Ish Vich Aras
+Queen Anga,Daughter,Satya
+Chit,Siblings,Ish Vich Aras Satya
