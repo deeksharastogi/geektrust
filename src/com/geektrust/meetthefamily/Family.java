@@ -1,27 +1,26 @@
 package com.geektrust.meetthefamily;
 
+import static com.geektrust.meetthefamily.Constants.Relationship.*;
+import static com.geektrust.meetthefamily.Constants.Message.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class Family {
 
 	private static final String FEMALE = "Female";
-	
+
 	private Member familyHead;
-	
-	private void setFamilyHead(Member familyHead) {
-		this.familyHead = familyHead;
-	}
 
 	/**
 	 * Add head of the family.
 	 * 
-	 * @param name - name of the member
+	 * @param name   - name of the member
 	 * @param gender - gender
 	 */
 	public void addFamilyHead(String name, String gender) {
 		Gender g = (FEMALE.equals(gender)) ? Gender.Female : Gender.Male;
-		setFamilyHead(new Member(name, g, null, null));
+		this.familyHead = new Member(name, g, null, null);
 	}
 
 	/**
@@ -54,16 +53,16 @@ public class Family {
 		String result;
 		Member member = searchMember(familyHead, motherName);
 		if (member == null) {
-			result = "PERSON_NOT_FOUND";
+			result = PERSON_NOT_FOUND;
 		} else if (childName == null || gender == null) {
-			result = "CHILD_ADDITION_FAILED";
+			result = CHILD_ADDITION_FAILED;
 		} else if (member.gender == Gender.Female) {
 			Gender g = (FEMALE.equals(gender)) ? Gender.Female : Gender.Male;
 			Member child = new Member(childName, g, member.spouse, member);
 			member.addChild(child);
-			result = "CHILD_ADDITION_SUCCEEDED";
+			result = CHILD_ADDITION_SUCCEEDED;
 		} else {
-			result = "CHILD_ADDITION_FAILED";
+			result = CHILD_ADDITION_FAILED;
 		}
 		return result;
 	}
@@ -81,9 +80,9 @@ public class Family {
 		String relations;
 		Member member = searchMember(familyHead, person);
 		if (member == null) {
-			relations = "PERSON_NOT_FOUND";
+			relations = PERSON_NOT_FOUND;
 		} else if (relationship == null) {
-			relations = "PROVIDE VALID RELATION";
+			relations = PROVIDE_VALID_RELATION;
 		} else {
 			relations = getRelationship(member, relationship);
 		}
@@ -100,71 +99,56 @@ public class Family {
 	 * @return list of names of relatives
 	 */
 	private String getRelationship(Member member, String relationship) {
-		String relations;
+		String relations = "";
 		switch (relationship) {
 
-		case Relationship.DAUGHTER:
-			relations = searchChild(member, Gender.Female);
-			break;
-		case Relationship.SON:
-			relations = searchChild(member, Gender.Male);
+		case DAUGHTER:
+			relations = member.searchChild(Gender.Female);
 			break;
 
-		case Relationship.SIBLINGS:
-			relations = searchSiblings(member);
+		case SON:
+			relations = member.searchChild(Gender.Male);
 			break;
 
-		case Relationship.SISTER_IN_LAW:
+		case SIBLINGS:
+			relations = member.searchSiblings();
+			break;
+
+		case SISTER_IN_LAW:
 			relations = searchInLaws(member, Gender.Female);
 			break;
-		case Relationship.BROTHER_IN_LAW:
+
+		case BROTHER_IN_LAW:
 			relations = searchInLaws(member, Gender.Male);
 			break;
 
-		case Relationship.MATERNAL_AUNT:
-			relations = searchAuntUncle(member.mother, Gender.Female);
+		case MATERNAL_AUNT:
+			if (member.mother != null)
+				relations = member.mother.searchAuntOrUncle(Gender.Female);
 			break;
-		case Relationship.PATERNAL_AUNT:
-			relations = searchAuntUncle(member.father, Gender.Female);
+
+		case PATERNAL_AUNT:
+			if (member.father != null)
+				relations = member.father.searchAuntOrUncle(Gender.Female);
 			break;
-		case Relationship.MATERNAL_UNCLE:
-			relations = searchAuntUncle(member.mother, Gender.Male);
+
+		case MATERNAL_UNCLE:
+			if (member.mother != null)
+				relations = member.mother.searchAuntOrUncle(Gender.Male);
 			break;
-		case Relationship.PATERNAL_UNCLE:
-			relations = searchAuntUncle(member.father, Gender.Male);
+
+		case PATERNAL_UNCLE:
+			if (member.father != null)
+				relations = member.father.searchAuntOrUncle(Gender.Male);
 			break;
+
 		default:
-			relations = "NOT YET IMPLEMENTED";
+			relations = NOT_YET_IMPLEMENTED;
 			break;
 		}
 
-		return ("".equals(relations)) ? "NONE" : relations;
-	}
+		return ("".equals(relations)) ? NONE : relations;
 
-	/**
-	 * Search Aunt/Uncle based on gender and Maternal/Paternal based on member being
-	 * father or mother. Returns list of names (as string) of brothers/sisters of
-	 * {@link Member}.
-	 * 
-	 * @param member
-	 * @param gender
-	 * @return
-	 */
-	private String searchAuntUncle(Member member, Gender gender) {
-
-		StringBuilder sb = new StringBuilder("");
-
-		if (member != null && member.mother != null) {
-			String personName = member.name;
-			member = member.mother;
-			for (Member m : member.children) {
-				if (!personName.equals(m.name) && m.gender == gender) {
-					sb.append(m.name).append(" ");
-				}
-			}
-		}
-
-		return sb.toString().trim();
 	}
 
 	/**
@@ -177,76 +161,21 @@ public class Family {
 	private String searchInLaws(Member member, Gender gender) {
 		String personName = member.name;
 		StringBuilder sb = new StringBuilder("");
+		String res = "";
 
-		if (member.spouse != null) {
-			String spouse = member.spouse.name;
-			Member temp = member.spouse.mother;
-			if (temp != null) {
-				for (Member m : temp.children) {
-					if (!spouse.equals(m.name) && m.gender == gender) {
-						sb.append(m.name).append(" ");
-					}
-				}
-			}
+		// search spouse mother children
+		if (member.spouse != null && member.spouse.mother != null) {
+			res = member.spouse.mother.searchChildren(gender, member.spouse.name);
 		}
+		sb.append(res);
 
-		searchInMotherChildren(member, gender, personName, sb);
-
-		return sb.toString().trim();
-	}
-
-	/**
-	 * 
-	 * @param member
-	 * @param gender
-	 * @param personName
-	 * @param sb
-	 */
-	private void searchInMotherChildren(Member member, Gender gender, String personName, StringBuilder sb) {
+		// search mother children
+		res = "";
 		if (member.mother != null) {
-			member = member.mother;
-			for (Member m : member.children) {
-				if (!personName.equals(m.name) && m.gender == gender) {
-					sb.append(m.name).append(" ");
-				}
-			}
+			res = member.mother.searchChildren(gender, personName);
 		}
-	}
+		sb.append(res);
 
-	/**
-	 * Search {@link Member} siblings
-	 * 
-	 * @param {@link Member}
-	 * @return
-	 */
-	private String searchSiblings(Member member) {
-		String personName = member.name;
-		StringBuilder sb = new StringBuilder("");
-		if (member.mother != null) {
-			member = member.mother;
-			for (Member m : member.children) {
-				if (!personName.equals(m.name)) {
-					sb.append(m.name).append(" ");
-				}
-			}
-		}
-		return sb.toString().trim();
-	}
-
-	/**
-	 * Search child of {@link Member} - daughter or son.
-	 * 
-	 * @param {@link Member}
-	 * @param gender
-	 * @return
-	 */
-	private String searchChild(Member member, Gender gender) {
-		StringBuilder sb = new StringBuilder("");
-		for (Member m : member.children) {
-			if (m.gender == gender) {
-				sb.append(m.name).append(" ");
-			}
-		}
 		return sb.toString().trim();
 	}
 
